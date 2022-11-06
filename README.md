@@ -1,6 +1,6 @@
 # Load Data from czech OTE
-Script performing load data from czech OTE for Today and result is formated to json.
+Load data from czech OTE for Today and result is formatted to json.
 
 ## Prerequisites
-Pytohn (with pip)3.10 =>
-requests library (pip install requests)
+1) Pytohn (with pip)3.10 =>
+2) requests library (pip install requests)
