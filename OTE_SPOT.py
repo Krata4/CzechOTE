@@ -2,6 +2,7 @@ import asyncio
 import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime
+import statistics
 
 async def get_price():
     url="https://www.ote-cr.cz/services/PublicDataService"
@@ -38,13 +39,21 @@ async def get_price():
     SUM_price = 0
     highest_price = 0
     highest_hour = 0
+    poplatek_distribuce = 300
+    poplatek_dodavatel = 300
+    poplatek_vykup = 360
+    dan = 1.21    
+    list_of_price = []
     print(f'{{')
     for item in root.findall('.//{http://www.ote-cr.cz/schema/service/public}Item'):
-        Price = item.find('{http://www.ote-cr.cz/schema/service/public}Price').text
+        Price = (float(item.find('{http://www.ote-cr.cz/schema/service/public}Price').text)+float(poplatek_distribuce)+float(poplatek_dodavatel))*dan
+        Price_sell = float(item.find('{http://www.ote-cr.cz/schema/service/public}Price').text)-float(poplatek_vykup)
         Hour = item.find('{http://www.ote-cr.cz/schema/service/public}Hour').text
         
         SUM_price = SUM_price + float(Price)
         print(f'"{"Hour_"+Hour+""}": {Price},')
+        print(f'"{"Hour_sell_"+Hour+""}": {Price_sell},')
+        list_of_price.append(float(Price))
         if lower_price > float(Price): 
             lower_price = float(Price)
             lower_hour = int(Hour)
@@ -53,6 +62,8 @@ async def get_price():
             highest_hour = int(Hour)
 
     average = SUM_price / 24
+    list_of_price.sort()
+    print(f'"{"median_price"}": {statistics.median(list_of_price)},')    
     print(f'"{"Lower_hour"}": {lower_hour},')
     print(f'"{"Lower_price"}": {lower_price},')
     print(f'"{"highest_price"}": {highest_price},')
