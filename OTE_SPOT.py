@@ -1,14 +1,28 @@
 import asyncio
 import requests
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timedelta
 import statistics
+import sys, getopt
 
 async def get_price():
+    date = ""
+    opts, args = getopt.getopt(sys.argv[1:],"d:tomorrow:",["date=","tomorrow"])
+    for opt, arg in opts:
+        if opt in ("-d", "--date"):
+            date = arg
+        elif opt in ("-tomorrow", "--tomorrow"):
+            tomorrow = datetime.today() + timedelta(1) 
+            date = tomorrow.strftime('%Y-%m-%d')    
+
+    if date=="":
+        date = datetime.today().strftime('%Y-%m-%d')
+
+    #print("datum="+date)
+    
     url="https://www.ote-cr.cz/services/PublicDataService"
     headers = {'content-type': 'application/soap+xml'}
     #headers = {'content-type': 'text/xml'}
-    today = datetime.today().strftime('%Y-%m-%d')
     body = """<?xml version="1.0" encoding="UTF-8" ?>
             <soapenv:Envelope
             xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
@@ -16,8 +30,8 @@ async def get_price():
             <soapenv:Header/>
             <soapenv:Body>
             <pub:GetDamPriceE>
-            <pub:StartDate>"""+today+"""</pub:StartDate>
-            <pub:EndDate>"""+today+"""</pub:EndDate>
+            <pub:StartDate>"""+date+"""</pub:StartDate>
+            <pub:EndDate>"""+date+"""</pub:EndDate>
             <!--Optional:-->
             <pub:StartHour>1</pub:StartHour>
             <!--Optional:-->
